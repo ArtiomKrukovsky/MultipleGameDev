@@ -1,24 +1,25 @@
 ﻿using System;
+using System.Collections;
 using System.Data;
+using System.Data.Common;
 using System.Data.SqlClient;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class Register : MonoBehaviour
+public class Login : MonoBehaviour
 {
     private string connectionstring;
     private string query;
+    private string passwordDbHash;
 
     public InputField login;
 
-    public InputField userName;
-
     public InputField password;
 
-    public void RegisterUser()
+    public void LoginUser()
     {
         Debug.Log("Connecting to database...");
 
@@ -35,32 +36,47 @@ public class Register : MonoBehaviour
             dbConnection.Open();
             Debug.Log("Connected to database.");
 
-            query = "Insert into Users (Id, Login, Name, PasswordHash)"
-                    + " values (@idUser, @loginUser, @nameUser, @passwordHash) ";
+            query = "SELECT PasswordHash FROM Users WHERE Login = @loginUser;";
 
             SqlCommand command = new SqlCommand(query, dbConnection);
 
-            //===== Добавить параметр @Id =====
-            command.Parameters.Add("@idUser", SqlDbType.NVarChar).Value = Guid.NewGuid().ToString();
-
-            //===== Добавить параметр @login =====
             command.Parameters.Add("@loginUser", SqlDbType.NVarChar).Value = login.text;
 
-            //===== Добавить параметр @name =====
-            command.Parameters.Add("@nameUser", SqlDbType.NVarChar).Value = userName.text;
+            using (DbDataReader reader = command.ExecuteReader())
+            {
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        // Index = 0 (select 1 parameter in query).
+                        passwordDbHash = reader.GetString(0);
 
-            //===== Добавить параметр @passwordHash =====
-            var inputHash = HashPassword(password.text);
-            command.Parameters.Add("@passwordHash", SqlDbType.NVarChar).Value = inputHash;
+                        //hash
+                        var inputHash = HashPassword(password.text);
 
-            // Выполнить Command (Используется для delete, insert, update).
-            int rowCount = command.ExecuteNonQuery();
-            Debug.Log("User added to database.");
-
-            SceneManager.LoadScene("Login");
-            Debug.Log("Redirect to scene Login.");
-
-            ResetFields();
+                        if (passwordDbHash != null)
+                        {
+                            if (inputHash == passwordDbHash)
+                            {
+                                Debug.Log("Login Confirmed.");
+                                ResetFields();
+                            }
+                            else
+                            {
+                                Debug.LogWarning("Login Not Confirmed.");
+                            }
+                        }
+                        else
+                        {
+                            Debug.LogWarning("PasswordDbHash is null");
+                        }
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("User with this login not found!");
+                }
+            }
 
             dbConnection.Close();
             Debug.Log("Connection to database closed.");
@@ -68,6 +84,7 @@ public class Register : MonoBehaviour
         catch (Exception ex)
         {
             Debug.LogWarning(ex.ToString());
+            ResetFields();
         }
     }
 
@@ -87,22 +104,19 @@ public class Register : MonoBehaviour
     public void ResetFields()
     {
         login.text = string.Empty;
-        userName.text = string.Empty;
         password.text = string.Empty;
     }
 
-
+    
     // Start is called before the first frame update
     void Start()
     {
-        
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
-    }
 
+    }
 }
