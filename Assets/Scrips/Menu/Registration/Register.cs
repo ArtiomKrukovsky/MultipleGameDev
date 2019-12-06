@@ -22,10 +22,10 @@ public class Register : MonoBehaviour
     {
         Debug.Log("Connecting to database...");
 
-        connectionstring = @"Data Source = 127.0.0.1; 
-        User Id = sa;
-        Password = 123456;
-        Initial Catalog = MultipleGameDev;";
+        connectionstring = @"Data Source = SQL5041.site4now.net; 
+        User Id = DB_A50AD1_broadwood_admin;
+        Password = qwe123ZXC.;
+        Initial Catalog = DB_A50AD1_broadwood;";
 
         SqlConnection dbConnection = new SqlConnection(connectionstring);
 
