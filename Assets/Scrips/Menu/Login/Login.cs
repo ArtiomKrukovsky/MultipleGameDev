@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
-using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
@@ -11,9 +9,7 @@ using UnityEngine.UI;
 
 public class Login : MonoBehaviour
 {
-    private string connectionstring;
-    private string query;
-    private string passwordDbHash;
+    private string _connectionString;
 
     public InputField login;
 
@@ -23,72 +19,61 @@ public class Login : MonoBehaviour
     {
         Debug.Log("Connecting to database...");
 
-        connectionstring = @"Data Source = SQL5041.site4now.net; 
+        _connectionString = @"Data Source = SQL5041.site4now.net; 
         User Id = DB_A50AD1_broadwood_admin;
         Password = qwe123ZXC.;
         Initial Catalog = DB_A50AD1_broadwood;";
 
-        SqlConnection dbConnection = new SqlConnection(connectionstring);
-
-        try
+        using (SqlConnection dbConnection = new SqlConnection(_connectionString))
         {
-
-            dbConnection.Open();
-            Debug.Log("Connected to database.");
-
-            query = "SELECT PasswordHash FROM Users WHERE Login = @loginUser;";
-
-            SqlCommand command = new SqlCommand(query, dbConnection);
-
-            command.Parameters.Add("@loginUser", SqlDbType.NVarChar).Value = login.text;
-
-            using (DbDataReader reader = command.ExecuteReader())
+            try
             {
-                if (reader.HasRows)
+                dbConnection.Open();
+                Debug.Log("Connected to database.");
+
+                string query = "SELECT PasswordHash FROM Users WHERE Login = @loginUser;";
+
+                SqlCommand command = new SqlCommand(query, dbConnection);
+
+                command.Parameters.Add("@loginUser", SqlDbType.NVarChar).Value = login.text;
+
+                using (DbDataReader reader = command.ExecuteReader())
                 {
+                    if (!reader.HasRows)
+                    {
+                        Debug.LogWarning("User with this login not found!");
+                    }
+
                     while (reader.Read())
                     {
                         // Index = 0 (select 1 parameter in query).
-                        passwordDbHash = reader.GetString(0);
+                        var passwordDbHash = reader.GetString(0);
 
                         //hash
                         var inputHash = HashPassword(password.text);
 
-                        if (passwordDbHash != null)
+                        if (passwordDbHash == null || inputHash != passwordDbHash)
                         {
-                            if (inputHash == passwordDbHash)
-                            {
-                                Debug.Log("Login Confirmed.");
-                                ResetFields();
-                            }
-                            else
-                            {
-                                Debug.LogWarning("Login Not Confirmed.");
-                            }
+                            Debug.LogWarning("PasswordDbHash is incorrect");
                         }
-                        else
-                        {
-                            Debug.LogWarning("PasswordDbHash is null");
-                        }
+
+                        Debug.Log("Login Confirmed.");
+                        ResetFields();
                     }
                 }
-                else
-                {
-                    Debug.LogWarning("User with this login not found!");
-                }
+                dbConnection.Close();
+                Debug.Log("Connection to database closed.");
             }
-
-            dbConnection.Close();
-            Debug.Log("Connection to database closed.");
-        }
-        catch (Exception ex)
-        {
-            Debug.LogWarning(ex.ToString());
-            ResetFields();
+            catch (Exception ex)
+            {
+                Debug.LogWarning(ex.ToString());
+                ResetFields();
+                dbConnection.Close();
+            }
         }
     }
 
-    public string HashPassword(string pswd)
+    private string HashPassword(string pswd)
     {
         var sha1 = SHA1.Create();
         var hash = sha1.ComputeHash(Encoding.UTF8.GetBytes(pswd));
@@ -101,7 +86,7 @@ public class Login : MonoBehaviour
         return hashString.ToString();
     }
 
-    public void ResetFields()
+    private void ResetFields()
     {
         login.text = string.Empty;
         password.text = string.Empty;
