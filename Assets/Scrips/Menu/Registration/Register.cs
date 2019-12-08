@@ -33,10 +33,12 @@ public class Register : MonoBehaviour
         {
             try
             {
+                Text foundErrorObject = FindObjectByTag("Error message");
                 dbConnection.Open();
                 Debug.Log("Connected to database.");
                 if (!login.text.Any() || !password.text.Any())
                 {
+                    ShowMessageError("Login or Password is incorrect", foundErrorObject);
                     Debug.LogWarning("Login or Password is incorrect");
                     return;
                 }
@@ -49,15 +51,17 @@ public class Register : MonoBehaviour
                     {
                         if (reader.HasRows)
                         {
+                            ShowMessageError("User with this login is exist!", foundErrorObject);
                             Debug.LogWarning("User with this login is exist!");
                             return;
                         }
                     }
                 }
 
-                if (!IsLoginValid(login.text))
+                if (!IsLoginValid(login.text) || !IsPasswordValid(password.text))
                 {
-                    Debug.LogWarning("This login is incorrect!");
+                    ShowMessageError("This login or password is incorrect!", foundErrorObject);
+                    Debug.LogWarning("This login or password is incorrect!");
                     return;
                 }
 
@@ -122,15 +126,34 @@ public class Register : MonoBehaviour
     {
         bool isSuccess = true;
 
-        bool result = userLogin.Contains("@");
+        Regex loginRegex = new Regex(@"(\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*)");
+        var result = loginRegex.Match(userLogin).Success;
+
         isSuccess = result;
 
-        Regex loginRegex = new Regex("^[a-zA-Z0-9]");
-        result = loginRegex.Match(userLogin).Success;
+        return isSuccess;
+    }
 
-        isSuccess = result && isSuccess;
+    private bool IsPasswordValid(string userPassword)
+    {
+        bool isSuccess = true;
+
+        Regex loginRegex = new Regex(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^a-zA-Z0-9])\S{1,16}$");
+        var result = loginRegex.Match(userPassword).Success;
+
+        isSuccess = result;
 
         return isSuccess;
+    }
+
+    private Text FindObjectByTag(string nameOfObject)
+    {
+        return GameObject.FindGameObjectWithTag(nameOfObject).GetComponent<Text>();
+    }
+
+    private void ShowMessageError(string message, Text textObject)
+    {
+        textObject.text = message;
     }
 
     // Start is called before the first frame update
