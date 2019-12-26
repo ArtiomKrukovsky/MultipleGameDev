@@ -34,14 +34,15 @@ public class Register : MonoBehaviour
             try
             {
                 Text foundErrorObject = FindObjectByTag("Error message");
-                dbConnection.Open();
-                Debug.Log("Connected to database.");
                 if (!login.text.Any() || !password.text.Any())
                 {
-                    ShowMessageError("Login or Password is incorrect", foundErrorObject);
-                    Debug.LogWarning("Login or Password is incorrect");
+                    ShowMessageError("Password or username not entered", foundErrorObject);
+                    Debug.LogWarning("Password or username not entered");
                     return;
                 }
+
+                dbConnection.Open();
+                Debug.Log("Connected to database.");
 
                 string selectLoginQuery = "SELECT Login FROM Users WHERE Login = @loginUserSelect;";
                 using (SqlCommand selectLoginCommand = new SqlCommand(selectLoginQuery, dbConnection))
@@ -51,8 +52,8 @@ public class Register : MonoBehaviour
                     {
                         if (reader.HasRows)
                         {
-                            ShowMessageError("User with this login is exist!", foundErrorObject);
-                            Debug.LogWarning("User with this login is exist!");
+                            ShowMessageError("User with this login is exist", foundErrorObject);
+                            Debug.LogWarning("User with this login is exist");
                             return;
                         }
                     }
@@ -60,8 +61,8 @@ public class Register : MonoBehaviour
 
                 if (!IsLoginValid(login.text) || !IsPasswordValid(password.text))
                 {
-                    ShowMessageError("This login or password is incorrect!", foundErrorObject);
-                    Debug.LogWarning("This login or password is incorrect!");
+                    ShowMessageError("This login or password is incorrect", foundErrorObject);
+                    Debug.LogWarning("This login or password is incorrect");
                     return;
                 }
 
@@ -155,18 +156,4 @@ public class Register : MonoBehaviour
     {
         textObject.text = message;
     }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
 }

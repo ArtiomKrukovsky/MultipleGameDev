@@ -2,6 +2,7 @@
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
@@ -28,9 +29,17 @@ public class Login : MonoBehaviour
         {
             try
             {
+                Text foundErrorObject = FindObjectByTag("Error message");
+                if (!login.text.Any() || !password.text.Any())
+                {
+                    ShowMessageError("Password or username not entered", foundErrorObject);
+                    Debug.LogWarning("Password or username not entered");
+                    return;
+                }
+
                 dbConnection.Open();
                 Debug.Log("Connected to database.");
-
+                
                 string query = "SELECT PasswordHash FROM Users WHERE Login = @loginUser;";
 
                 SqlCommand command = new SqlCommand(query, dbConnection);
@@ -41,6 +50,7 @@ public class Login : MonoBehaviour
                 {
                     if (!reader.HasRows)
                     {
+                        ShowMessageError("User with this login and password does not exist", foundErrorObject);
                         Debug.LogWarning("User with this login not found!");
                     }
 
@@ -54,6 +64,7 @@ public class Login : MonoBehaviour
 
                         if (passwordDbHash == null || inputHash != passwordDbHash)
                         {
+                            ShowMessageError("User with this login and password does not exist", foundErrorObject);
                             Debug.LogWarning("PasswordDbHash is incorrect");
                         }
 
@@ -92,16 +103,13 @@ public class Login : MonoBehaviour
         password.text = string.Empty;
     }
 
-    
-    // Start is called before the first frame update
-    void Start()
+    private Text FindObjectByTag(string nameOfObject)
     {
-
+        return GameObject.FindGameObjectWithTag(nameOfObject).GetComponent<Text>();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void ShowMessageError(string message, Text textObject)
     {
-
+        textObject.text = message;
     }
 }
