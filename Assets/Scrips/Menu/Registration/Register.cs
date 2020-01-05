@@ -97,6 +97,9 @@ public class Register : MonoBehaviour
             }
             catch (Exception ex)
             {
+                Text foundErrorObject = FindObjectByTag("Error message");
+                ShowMessageError("Oooppss, something went wrong, try later :(", foundErrorObject);
+                ResetFields();
                 dbConnection.Close();
                 Debug.LogWarning(ex.ToString());
             }

@@ -1,41 +1,40 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
-[AddComponentMenu("Network/NetworkManagerHUD")]
-[RequireComponent(typeof(NetworkManager))]
-[EditorBrowsable(EditorBrowsableState.Never)]
 public class CreateLobby : MonoBehaviour
 {
-    public NetworkManager manager;
-
-    void Awake()
-    {
-        manager = GetComponent<NetworkManager>();
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-       
-    }
-
     public void CreateServer()
     {
-        if (manager.matchMaker == null)
+        try
         {
-            manager.StartMatchMaker();
+            GameObject network = this.FindNetworkByTag();
+            var manager = network?.GetComponent<NetworkManager>();
+
+            if (manager == null)
+            {
+                Debug.Log($"Manager is null");
+                return;
+            }
+
+            if (manager.matchMaker == null)
+            {
+                manager.StartMatchMaker();
+            }
+
+            SceneManager.LoadScene("GameScene");
+            manager.matchMaker.CreateMatch(manager.matchName, manager.matchSize, true, "", "", "", 0, 0, manager.OnMatchCreate);
         }
-        
-        manager.matchMaker.CreateMatch(manager.matchName, manager.matchSize, true, "", "", "", 0, 0, manager.OnMatchCreate);
+        catch(Exception e)
+        {
+            Debug.Log($"Error, something went wrong: { e.Message }");
+            SceneManager.LoadScene("Menu");
+        }
+    }
+
+    private GameObject FindNetworkByTag()
+    {
+        return GameObject.FindGameObjectWithTag("Network");
     }
 }

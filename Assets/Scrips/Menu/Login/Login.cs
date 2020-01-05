@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Login : MonoBehaviour
@@ -69,6 +70,7 @@ public class Login : MonoBehaviour
                         }
 
                         Debug.Log("Login Confirmed.");
+                        SceneManager.LoadScene("Menu");
                         ResetFields();
                     }
                 }
@@ -77,6 +79,8 @@ public class Login : MonoBehaviour
             }
             catch (Exception ex)
             {
+                Text foundErrorObject = FindObjectByTag("Error message");
+                ShowMessageError("Oooppss, something went wrong, try later :(", foundErrorObject);
                 Debug.LogWarning(ex.ToString());
                 ResetFields();
                 dbConnection.Close();
