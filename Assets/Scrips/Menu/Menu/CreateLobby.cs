@@ -10,32 +10,32 @@ using UnityEngine.Networking;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class CreateLobby : MonoBehaviour
 {
-    public string IpAddress;
-    public string Port;
-    private bool _started;
+    public NetworkManager manager;
+
+    void Awake()
+    {
+        manager = GetComponent<NetworkManager>();
+    }
 
     // Start is called before the first frame update
     void Start()
     {
-        _started = false;
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+       
     }
 
     public void CreateServer()
     {
-        if (!_started)
+        if (manager.matchMaker == null)
         {
-            _started = true;
-            NetworkManager.singleton.networkAddress = IpAddress;
-            NetworkManager.singleton.networkPort = int.Parse(Port);
-            NetworkManager.singleton.StartHost();
+            manager.StartMatchMaker();
         }
+        
+        manager.matchMaker.CreateMatch(manager.matchName, manager.matchSize, true, "", "", "", 0, 0, manager.OnMatchCreate);
     }
-
-
 }
