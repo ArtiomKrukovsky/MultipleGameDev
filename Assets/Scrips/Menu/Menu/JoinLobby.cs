@@ -26,9 +26,13 @@ public class JoinLobby : MonoBehaviour
     {
         try
         {
+            if (string.IsNullOrEmpty(matchName))
+            {
+                return;
+            }
+
             foreach (var match in manager.matches)
             {
-                Debug.Log($"Match find");
                 if (match.name == matchName)
                 {
                     SceneManager.LoadScene("GameScene");

@@ -41,6 +41,13 @@ public class Register : MonoBehaviour
                     return;
                 }
 
+                if (!IsLoginValid(login.text) || !IsPasswordValid(password.text))
+                {
+                    ShowMessageError("This login or password is incorrect", foundErrorObject);
+                    Debug.LogWarning("This login or password is incorrect");
+                    return;
+                }
+
                 dbConnection.Open();
                 Debug.Log("Connected to database.");
 
@@ -57,13 +64,6 @@ public class Register : MonoBehaviour
                             return;
                         }
                     }
-                }
-
-                if (!IsLoginValid(login.text) || !IsPasswordValid(password.text))
-                {
-                    ShowMessageError("This login or password is incorrect", foundErrorObject);
-                    Debug.LogWarning("This login or password is incorrect");
-                    return;
                 }
 
                 string query = "Insert into Users (Id, Login, Name, PasswordHash)"

@@ -13,7 +13,6 @@ public class PlayerMotor : MonoBehaviour
     private Vector3 rotationCamera = Vector3.zero;
 
 
-    // Start is called before the first frame update
     void Start()
     {
         rigidbody = GetComponent<Rigidbody>();
