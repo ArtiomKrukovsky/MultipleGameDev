@@ -38,5 +38,6 @@ public class PlayerController : MonoBehaviour
         Vector3 camRotation = new Vector3(xRotation, 0f, 0f) * lookSpeed;
 
         motor.RotateCam(camRotation);
+        
     }
 }

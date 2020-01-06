@@ -37,6 +37,7 @@ public class PlayerMotor : MonoBehaviour
     private void FixedUpdate()
     {
         PerformMove();
+        PerformRotation();
     }
 
     void PerformMove()
@@ -51,8 +52,8 @@ public class PlayerMotor : MonoBehaviour
     {
         rigidbody.MoveRotation(rigidbody.rotation * Quaternion.Euler(rotation));
         if (camera != null)
-        {
-            camera.transform.Rotate(rotationCamera);
+        { 
+            camera.transform.Rotate(-rotationCamera);
         }
     }
 }
