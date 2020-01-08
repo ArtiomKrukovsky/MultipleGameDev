@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Linq;
+using Boo.Lang;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.Networking.Match;
 using UnityEngine.SceneManagement;
 
 public class JoinLobby : MonoBehaviour
 {
+    [SerializeField]
+    public List<MatchInfo> matches;
     private GameObject network;
     private NetworkManager manager;
 
@@ -42,9 +47,9 @@ public class JoinLobby : MonoBehaviour
                 }
             }
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Debug.Log($"Error, something went wrong: { e.Message }");
+            Debug.Log($"Error, something went wrong: { ex.Message }");
             SceneManager.LoadScene("Menu");
         }
     }
@@ -73,5 +78,34 @@ public class JoinLobby : MonoBehaviour
     private GameObject FindObjectByTag(string tag)
     {
         return GameObject.FindGameObjectWithTag(tag);
+    }
+
+    public List<MatchInfo> GetMatches()
+    {
+        try
+        {
+            string name = manager.matches[0].name;
+            int count = manager.matches[0].currentSize;
+            foreach (var match in manager.matches)
+            {
+                matches.Add(new MatchInfo()
+                {
+                    MatchName = match.name,
+                    MatchSize = match.currentSize
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.Log($"Error, something went wrong: { ex.Message }");
+        }
+       
+        return matches;
+    }
+
+    public class MatchInfo
+    {
+        public string MatchName { get; set; }
+        public int MatchSize { get; set; }
     }
 }
