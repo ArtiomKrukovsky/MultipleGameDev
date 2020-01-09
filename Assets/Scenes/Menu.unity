@@ -1930,7 +1930,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1775348267}
   m_HandleRect: {fileID: 1775348266}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -2536,6 +2536,7 @@ GameObject:
   - component: {fileID: 850597697}
   - component: {fileID: 850597696}
   - component: {fileID: 850597695}
+  - component: {fileID: 850597698}
   m_Layer: 0
   m_Name: Refresh
   m_TagString: Untagged
@@ -2605,7 +2606,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 850597696}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 850597698}
+        m_MethodName: RefreshServersMatches
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &850597696
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2642,6 +2654,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 850597693}
   m_CullTransparentMesh: 0
+--- !u!114 &850597698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 850597693}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3337e00a3f847546804a891dac33a68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 4847783804011957058, guid: 481f6307311122a4496c89e8861699f4, type: 3}
+  content: {fileID: 912636958}
 --- !u!1 &904726181
 GameObject:
   m_ObjectHideFlags: 0
@@ -2689,7 +2715,6 @@ GameObject:
   - component: {fileID: 912636958}
   - component: {fileID: 912636960}
   - component: {fileID: 912636959}
-  - component: {fileID: 912636961}
   m_Layer: 5
   m_Name: Content
   m_TagString: Untagged
@@ -2755,20 +2780,6 @@ MonoBehaviour:
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
---- !u!114 &912636961
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 912636957}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b3337e00a3f847546804a891dac33a68, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  prefab: {fileID: 4847783804011957058, guid: 481f6307311122a4496c89e8861699f4, type: 3}
-  content: {fileID: 912636958}
 --- !u!1 &921360789
 GameObject:
   m_ObjectHideFlags: 0

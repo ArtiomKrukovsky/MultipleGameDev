@@ -1,68 +1,64 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mime;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-[InitializeOnLoad]
 public class ScrollViewAdapter : MonoBehaviour
 {
     public RectTransform prefab;
     public RectTransform content;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        GetMatchViewElements();
+        StartCoroutine(GetMatchViewElements(true));
     }
 
-    // Update is called once per frame
-    void Update()
+    public void RefreshServersMatches()
     {
-        
+        StartCoroutine(GetMatchViewElements());
     }
 
-    public MatchModel[] GetMatches()
+    private MatchModel[] GetMatches()
     {
         try
         {
             GameObject network = this.FindObjectByTag("Network");
             var manager = network?.GetComponent<NetworkManager>();
 
-            if (manager.matches != null)
+            var matches = new MatchModel[manager.matches.Count];
+            for (int i = 0; i < matches.Length; i++)
             {
-                var matches = new MatchModel[manager.matches.Count];
-
-                for (int i = 0; i < matches.Length; i++)
-                {
-                    matches[i] = new MatchModel()
-                    {
-                        MatchName = manager.matches[i].name,
-                        MatchSize = manager.matches[i].currentSize
-                    };
-                }
-
-                return matches;
+               matches[i] = new MatchModel()
+               {
+                   MatchName = manager.matches[i].name,
+                   MatchSize = manager.matches[i].currentSize
+               };
             }
-            else
-            {
-                return Array.Empty<MatchModel>();
-            }
+
+            return matches;
         }
         catch (Exception ex)
         {
-            Debug.Log($"Error, in GetMatches something went wrong: { ex.Message }");
+            Debug.Log($"Error, something went wrong: { ex.Message }");
             return Array.Empty<MatchModel>();
         }
     }
 
-    public void GetMatchViewElements()
+    public IEnumerator GetMatchViewElements(bool isStart = false)
     {
+        if (isStart)
+        {
+            yield return new WaitForSeconds(0.5f);
+        }
+
         var matches = GetMatches();
+
+        if (content == null || matches == null || prefab == null)
+        {
+            Debug.Log($"Error, something went wrong");
+            yield break;
+        }
 
         foreach (Transform child in content)
         {
@@ -72,13 +68,18 @@ public class ScrollViewAdapter : MonoBehaviour
         foreach (var match in matches)
         {
             var instance = GameObject.Instantiate(prefab.gameObject) as GameObject;
-            instance.transform.SetParent(content, false);
+            instance?.transform.SetParent(content, false);
             InitializeInstanceView(instance, match);
         }
     }
 
-    public void InitializeInstanceView(GameObject viewGameObject, MatchModel model)
+    private void InitializeInstanceView(GameObject viewGameObject, MatchModel model)
     {
+        if (viewGameObject == null)
+        {
+            return;
+        }
+
         MatchViewModel view = new MatchViewModel(viewGameObject.transform);
         view.MatchName.text = model.MatchName;
         view.MatchSize.text = model.MatchSize.ToString();
@@ -89,13 +90,13 @@ public class ScrollViewAdapter : MonoBehaviour
         return GameObject.FindGameObjectWithTag(tag);
     }
 
-    public class MatchModel
+    private class MatchModel
     {
         public string MatchName { get; set; }
         public int MatchSize { get; set; }
     }
 
-    public class MatchViewModel
+    private class MatchViewModel
     {
         public Text MatchName { get; set; }
         public Text MatchSize { get; set; }
@@ -105,6 +106,5 @@ public class ScrollViewAdapter : MonoBehaviour
             MatchName = rootView.Find("MatchName").GetComponent<Text>();
             MatchSize = rootView.Find("MatchSize").GetComponent<Text>();
         }
-
     }
 }
