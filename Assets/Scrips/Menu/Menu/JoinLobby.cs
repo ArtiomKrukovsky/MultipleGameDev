@@ -11,7 +11,7 @@ public class JoinLobby : MonoBehaviour
     [SerializeField]
     public List<MatchInfo> matches;
     private GameObject network;
-    private NetworkManager manager;
+    private static NetworkManager manager;
 
     public void Start()
     {
@@ -54,7 +54,7 @@ public class JoinLobby : MonoBehaviour
         }
     }
 
-    public void RefreshMatchies()
+    public static void RefreshMatchies()
     {
         if (manager == null)
         {

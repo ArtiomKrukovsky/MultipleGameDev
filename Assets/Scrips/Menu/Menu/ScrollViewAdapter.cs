@@ -16,7 +16,9 @@ public class ScrollViewAdapter : MonoBehaviour
 
     public void RefreshServersMatches()
     {
-        StartCoroutine(GetMatchViewElements());
+        gameObject.GetComponent<Button>().interactable = false;
+        JoinLobby.RefreshMatchies();
+        StartCoroutine(GetMatchViewElements(true));
     }
 
     private MatchModel[] GetMatches()
