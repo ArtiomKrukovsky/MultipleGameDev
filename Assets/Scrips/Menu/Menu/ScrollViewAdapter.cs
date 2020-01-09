@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Mime;
 using UnityEditor;
 using UnityEngine;
@@ -16,7 +17,7 @@ public class ScrollViewAdapter : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        GetMatchViewElements();
     }
 
     // Update is called once per frame
@@ -32,21 +33,29 @@ public class ScrollViewAdapter : MonoBehaviour
             GameObject network = this.FindObjectByTag("Network");
             var manager = network?.GetComponent<NetworkManager>();
 
-            var matches = new MatchModel[manager.matches.Count];
-            for (int i = 0; i < matches.Length; i++)
+            if (manager.matches != null)
             {
-               matches[i] = new MatchModel()
-               {
-                   MatchName = manager.matches[i].name,
-                   MatchSize = manager.matches[i].currentSize
-               };
-            }
+                var matches = new MatchModel[manager.matches.Count];
 
-            return matches;
+                for (int i = 0; i < matches.Length; i++)
+                {
+                    matches[i] = new MatchModel()
+                    {
+                        MatchName = manager.matches[i].name,
+                        MatchSize = manager.matches[i].currentSize
+                    };
+                }
+
+                return matches;
+            }
+            else
+            {
+                return Array.Empty<MatchModel>();
+            }
         }
         catch (Exception ex)
         {
-            Debug.Log($"Error, something went wrong: { ex.Message }");
+            Debug.Log($"Error, in GetMatches something went wrong: { ex.Message }");
             return Array.Empty<MatchModel>();
         }
     }
