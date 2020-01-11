@@ -11,14 +11,32 @@ public class ScrollViewAdapter : MonoBehaviour
 
     private void Start()
     {
-        StartCoroutine(GetMatchViewElements(true));
+        try
+        {
+            StartCoroutine(GetMatchViewElements(true));
+        }
+        catch (Exception e)
+        {
+            Debug.Log($"Error, something went wrong: { e.Message }");
+        }
     }
 
     public void RefreshServersMatches()
     {
-        gameObject.GetComponent<Button>().interactable = false;
-        JoinLobby.RefreshMatchies();
-        StartCoroutine(GetMatchViewElements(true));
+        try
+        {
+           gameObject.GetComponent<Button>().interactable = false;
+
+           JoinLobby.RefreshMatchies();
+           GameObject searchLine = this.FindObjectByTag("SearchLine");
+
+           StartCoroutine(GetMatchViewElements(true, searchLine.GetComponent<InputField>().text));
+           StartCoroutine(EnableRefreshButton());
+        }
+        catch(Exception e)
+        {
+            Debug.Log($"Error, something went wrong: { e.Message }");
+        }
     }
 
     private MatchModel[] GetMatches()
@@ -40,14 +58,13 @@ public class ScrollViewAdapter : MonoBehaviour
 
             return matches;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Debug.Log($"Error, something went wrong: { ex.Message }");
             return Array.Empty<MatchModel>();
         }
     }
 
-    public IEnumerator GetMatchViewElements(bool isStart = false)
+    private IEnumerator GetMatchViewElements(bool isStart = false, string searchText = null)
     {
         if (isStart)
         {
@@ -67,12 +84,30 @@ public class ScrollViewAdapter : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        foreach (var match in matches)
+        if (!string.IsNullOrEmpty(searchText))
         {
-            var instance = GameObject.Instantiate(prefab.gameObject) as GameObject;
-            instance?.transform.SetParent(content, false);
-            InitializeInstanceView(instance, match);
+            foreach (var match in matches)
+            {
+                if (match.MatchName.ToLower().Contains(searchText.ToLower()))
+                {
+                    SetMatchParametrs(prefab, content, match);
+                }
+            }
         }
+        else
+        {
+            foreach (var match in matches)
+            {
+               SetMatchParametrs(prefab, content, match);
+            }
+        }
+    }
+
+    private void SetMatchParametrs(RectTransform prefab, RectTransform content, MatchModel match)
+    {
+        var instance = GameObject.Instantiate(prefab.gameObject) as GameObject;
+        instance?.transform.SetParent(content, false);
+        InitializeInstanceView(instance, match);
     }
 
     private void InitializeInstanceView(GameObject viewGameObject, MatchModel model)
@@ -90,6 +125,12 @@ public class ScrollViewAdapter : MonoBehaviour
     private GameObject FindObjectByTag(string tag)
     {
         return GameObject.FindGameObjectWithTag(tag);
+    }
+
+    private IEnumerator EnableRefreshButton()
+    {
+        yield return new WaitForSeconds(1f);
+        gameObject.GetComponent<Button>().interactable = true;
     }
 
     private class MatchModel
