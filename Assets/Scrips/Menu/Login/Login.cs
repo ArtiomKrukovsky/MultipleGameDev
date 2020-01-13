@@ -19,8 +19,6 @@ public class Login : MonoBehaviour
 
     public void LoginUser()
     {
-        Debug.Log("Connecting to database...");
-
         _connectionString = @"Data Source = SQL5041.site4now.net; 
         User Id = DB_A50AD1_broadwood_admin;
         Password = qwe123ZXC.;
@@ -53,6 +51,8 @@ public class Login : MonoBehaviour
                     {
                         ShowMessageError("User with this login and password does not exist", foundErrorObject);
                         Debug.LogWarning("User with this login not found!");
+                        dbConnection.Close();
+                        return;
                     }
 
                     while (reader.Read())
