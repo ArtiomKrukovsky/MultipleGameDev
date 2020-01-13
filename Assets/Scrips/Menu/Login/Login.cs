@@ -68,10 +68,12 @@ public class Login : MonoBehaviour
                             ShowMessageError("User with this login and password does not exist", foundErrorObject);
                             Debug.LogWarning("PasswordDbHash is incorrect");
                         }
-
-                        Debug.Log("Login Confirmed.");
-                        SceneManager.LoadScene("Menu");
-                        ResetFields();
+                        else
+                        {
+                            Debug.Log("Login Confirmed.");
+                            SceneManager.LoadScene("Menu");
+                            ResetFields();
+                        }
                     }
                 }
                 dbConnection.Close();
