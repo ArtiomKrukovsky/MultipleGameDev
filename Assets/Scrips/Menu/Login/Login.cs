@@ -39,7 +39,7 @@ public class Login : MonoBehaviour
                 dbConnection.Open();
                 Debug.Log("Connected to database.");
                 
-                string query = "SELECT PasswordHash FROM Users WHERE Login = @loginUser;";
+                string query = "SELECT PasswordHash, Name FROM Users WHERE Login = @loginUser;";
 
                 SqlCommand command = new SqlCommand(query, dbConnection);
 
@@ -70,6 +70,9 @@ public class Login : MonoBehaviour
                         }
                         else
                         {
+                            PlayerPrefs.DeleteAll();
+                            PlayerPrefs.SetString("PlayerName", reader.GetString(1));
+
                             Debug.Log("Login Confirmed.");
                             SceneManager.LoadScene("Menu");
                             ResetFields();
