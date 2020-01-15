@@ -1,31 +1,59 @@
 ﻿using System;
-using System.Linq;
-using Boo.Lang;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
-public class JoinLobby : MonoBehaviour
+public class JoinMatch : MonoBehaviour
 {
+    public Text matchName;
+
     private GameObject network;
     private static NetworkManager manager;
 
-    public void Start()
+    private const float DoubleClickTime = .2f;
+    private float lastClickTime;
+
+    void Start()
     {
         try
         {
             network = this.FindObjectByTag("Network");
             manager = network?.GetComponent<NetworkManager>();
-            RefreshMatchies();
         }
         catch (Exception e)
         {
-            Debug.Log($"Error, something went wrong: { e.Message }");
+            Debug.LogError($"Error, something went wrong: { e.Message }");
         }
     }
 
+    
+    void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            try
+            {
+                float timeSinceLastClick = Time.time - lastClickTime;
 
-    public void JoinMatch(string matchName)
+                if (timeSinceLastClick <= DoubleClickTime)
+                {
+                    JoinToMatch(matchName.text);
+                    Debug.Log("User join to match!");
+                }
+
+                lastClickTime = Time.time;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error, something went wrong: { ex.Message }");
+            }
+        }
+    }
+
+    private void JoinToMatch(string matchName)
     {
         try
         {
@@ -49,27 +77,6 @@ public class JoinLobby : MonoBehaviour
         {
             Debug.Log($"Error, something went wrong: { ex.Message }");
             SceneManager.LoadScene("Menu");
-        }
-    }
-
-    public static void RefreshMatchies()
-    {
-        if (manager == null)
-        {
-            Debug.Log($"Manager is null");
-            return;
-        }
-
-        if (manager.matchMaker != null)
-        {
-            manager.StopMatchMaker();
-        }
-
-        manager.StartMatchMaker();
-
-        if (manager.matches == null)
-        {
-            manager.matchMaker.ListMatches(0, 20, "", true, 0, 0, manager.OnMatchList);
         }
     }
 
