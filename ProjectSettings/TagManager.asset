@@ -8,6 +8,7 @@ TagManager:
   - Network
   - CreateLobbyPopup
   - SearchLine
+  - GameMenu
   layers:
   - Default
   - TransparentFX
