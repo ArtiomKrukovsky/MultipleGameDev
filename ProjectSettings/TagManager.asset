@@ -5,6 +5,10 @@ TagManager:
   serializedVersion: 2
   tags:
   - Error message
+  - Network
+  - CreateLobbyPopup
+  - SearchLine
+  - GameMenu
   layers:
   - Default
   - TransparentFX

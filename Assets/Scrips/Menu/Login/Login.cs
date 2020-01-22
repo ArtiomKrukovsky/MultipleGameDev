@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Login : MonoBehaviour
@@ -18,8 +19,6 @@ public class Login : MonoBehaviour
 
     public void LoginUser()
     {
-        Debug.Log("Connecting to database...");
-
         _connectionString = @"Data Source = SQL5041.site4now.net; 
         User Id = DB_A50AD1_broadwood_admin;
         Password = qwe123ZXC.;
@@ -40,7 +39,7 @@ public class Login : MonoBehaviour
                 dbConnection.Open();
                 Debug.Log("Connected to database.");
                 
-                string query = "SELECT PasswordHash FROM Users WHERE Login = @loginUser;";
+                string query = "SELECT PasswordHash, Name FROM Users WHERE Login = @loginUser;";
 
                 SqlCommand command = new SqlCommand(query, dbConnection);
 
@@ -52,6 +51,8 @@ public class Login : MonoBehaviour
                     {
                         ShowMessageError("User with this login and password does not exist", foundErrorObject);
                         Debug.LogWarning("User with this login not found!");
+                        dbConnection.Close();
+                        return;
                     }
 
                     while (reader.Read())
@@ -67,9 +68,15 @@ public class Login : MonoBehaviour
                             ShowMessageError("User with this login and password does not exist", foundErrorObject);
                             Debug.LogWarning("PasswordDbHash is incorrect");
                         }
+                        else
+                        {
+                            PlayerPrefs.DeleteAll();
+                            PlayerPrefs.SetString("PlayerName", reader.GetString(1));
 
-                        Debug.Log("Login Confirmed.");
-                        ResetFields();
+                            Debug.Log("Login Confirmed.");
+                            SceneManager.LoadScene("Menu");
+                            ResetFields();
+                        }
                     }
                 }
                 dbConnection.Close();
@@ -77,6 +84,8 @@ public class Login : MonoBehaviour
             }
             catch (Exception ex)
             {
+                Text foundErrorObject = FindObjectByTag("Error message");
+                ShowMessageError("Oooppss, something went wrong, try later :(", foundErrorObject);
                 Debug.LogWarning(ex.ToString());
                 ResetFields();
                 dbConnection.Close();
